@@ -1,19 +1,19 @@
-[agente] 2026-11-15T14:07:01.145 A2A em http://127.0.0.1:7300/a2a, card em http://127.0.0.1:7300/.well-known/agent-card.json, MCP em http://localhost:7301/mcp
-[agente] 2026-11-15T14:07:01.363 task=dc9df6f2-b95a-4b3c-a3b1-07c0cb0d7268 SUBMITTED trace=4bf92f3577b34da6a3ce929d0e0e4736
-[agente] 2026-11-15T14:07:01.407 task=dc9df6f2-b95a-4b3c-a3b1-07c0cb0d7268 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:07:01.420 task=dc9df6f2-b95a-4b3c-a3b1-07c0cb0d7268 INPUT_REQUIRED opcoes=['sala-fusca', 'sala-mirante'] (requestState guardado, 517 bytes)
-[agente] 2026-11-15T14:07:01.504 task=dc9df6f2-b95a-4b3c-a3b1-07c0cb0d7268 COMPLETED res-0003 em sala-mirante
-[agente] 2026-11-15T14:07:01.511 task=e902260a-ac35-47dc-9855-30e1c04cf47a SUBMITTED trace=65511a44225438c1234ba093244457a9
-[agente] 2026-11-15T14:07:01.519 task=e902260a-ac35-47dc-9855-30e1c04cf47a tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:07:01.527 task=e902260a-ac35-47dc-9855-30e1c04cf47a INPUT_REQUIRED opcoes=['sala-fusca'] (requestState guardado, 494 bytes)
-[agente] 2026-11-15T14:07:01.560 task=e902260a-ac35-47dc-9855-30e1c04cf47a CANCELED motivo=recusado
-[agente] 2026-11-15T14:07:01.565 task=8f576133-7421-4e6a-a6bb-964b3550df54 SUBMITTED trace=ccbd897d052b7a8102c0e4b747016e5b
-[agente] 2026-11-15T14:07:01.574 task=8f576133-7421-4e6a-a6bb-964b3550df54 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:07:01.582 task=8f576133-7421-4e6a-a6bb-964b3550df54 FAILED Error executing tool reservar_sala: Sala inexistente: sala-inexistente
-[agente] 2026-11-15T14:07:03.275 task=93a015cb-ac6a-49a8-9e73-c1cd3f6c78ac SUBMITTED trace=610d5c15a6981eb757cb17f68f3debe8
-[agente] 2026-11-15T14:07:03.286 task=93a015cb-ac6a-49a8-9e73-c1cd3f6c78ac tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:07:03.296 task=93a015cb-ac6a-49a8-9e73-c1cd3f6c78ac INPUT_REQUIRED opcoes=['sala-garagem', 'sala-mirante'] (requestState guardado, 521 bytes)
-[agente] 2026-11-15T14:07:03.691 task=93a015cb-ac6a-49a8-9e73-c1cd3f6c78ac FAILED erro de protocolo/transporte MCP: ConnectError('All connection attempts failed')
-[agente] 2026-11-15T14:07:05.715 task=bf0ee85d-9f9a-4e03-8776-8d23b37a4972 SUBMITTED trace=e2a3e56b304cf208ea412f6898230967
-[agente] 2026-11-15T14:07:05.732 task=bf0ee85d-9f9a-4e03-8776-8d23b37a4972 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:07:05.765 task=bf0ee85d-9f9a-4e03-8776-8d23b37a4972 COMPLETED res-0003 em sala-aquario
+[agente] 2026-11-15T14:42:55.323 A2A em http://127.0.0.1:7300/a2a, card em http://127.0.0.1:7300/.well-known/agent-card.json, MCP em http://localhost:7301/mcp
+[agente] 2026-11-15T14:42:55.520 task=d1f9ffbc-9efd-4bb0-8b88-88723a33cace SUBMITTED trace=4bf92f3577b34da6a3ce929d0e0e4736
+[agente] 2026-11-15T14:42:55.554 task=d1f9ffbc-9efd-4bb0-8b88-88723a33cace tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:55.564 task=d1f9ffbc-9efd-4bb0-8b88-88723a33cace INPUT_REQUIRED opcoes=['sala-fusca', 'sala-mirante'] (requestState guardado, 517 bytes)
+[agente] 2026-11-15T14:42:55.629 task=d1f9ffbc-9efd-4bb0-8b88-88723a33cace COMPLETED res-0003 em sala-mirante
+[agente] 2026-11-15T14:42:55.634 task=2e94c4e4-e8f6-4fd3-92ec-77926f10ac0c SUBMITTED trace=7115b90e092defb2c24273be63803b07
+[agente] 2026-11-15T14:42:55.640 task=2e94c4e4-e8f6-4fd3-92ec-77926f10ac0c tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:55.646 task=2e94c4e4-e8f6-4fd3-92ec-77926f10ac0c INPUT_REQUIRED opcoes=['sala-fusca'] (requestState guardado, 494 bytes)
+[agente] 2026-11-15T14:42:55.672 task=2e94c4e4-e8f6-4fd3-92ec-77926f10ac0c CANCELED motivo=recusado
+[agente] 2026-11-15T14:42:55.677 task=ad4e6537-fff8-430a-b2cd-69231d384489 SUBMITTED trace=b242149a1243b88e791272fd57627685
+[agente] 2026-11-15T14:42:55.685 task=ad4e6537-fff8-430a-b2cd-69231d384489 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:55.691 task=ad4e6537-fff8-430a-b2cd-69231d384489 FAILED Error executing tool reservar_sala: Sala inexistente: sala-inexistente
+[agente] 2026-11-15T14:42:57.048 task=2c0dfc3a-0cc4-4625-a7cb-d3d1ec8a5c6c SUBMITTED trace=6fd049705ef2e9fcf3679626afdacb43
+[agente] 2026-11-15T14:42:57.056 task=2c0dfc3a-0cc4-4625-a7cb-d3d1ec8a5c6c tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:57.064 task=2c0dfc3a-0cc4-4625-a7cb-d3d1ec8a5c6c INPUT_REQUIRED opcoes=['sala-garagem', 'sala-mirante'] (requestState guardado, 521 bytes)
+[agente] 2026-11-15T14:42:57.453 task=2c0dfc3a-0cc4-4625-a7cb-d3d1ec8a5c6c FAILED erro de protocolo/transporte MCP: ConnectError('All connection attempts failed')
+[agente] 2026-11-15T14:42:58.472 task=a816b77b-596c-4c90-af34-9759dd962b70 SUBMITTED trace=7924941db4927ab3df8f10648ad7d3ad
+[agente] 2026-11-15T14:42:58.497 task=a816b77b-596c-4c90-af34-9759dd962b70 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:58.524 task=a816b77b-596c-4c90-af34-9759dd962b70 COMPLETED res-0003 em sala-aquario

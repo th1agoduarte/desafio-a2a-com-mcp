@@ -1,33 +1,33 @@
-[agente] 2026-11-15T14:06:55.569 A2A em http://127.0.0.1:7300/a2a, card em http://127.0.0.1:7300/.well-known/agent-card.json, MCP em http://localhost:7301/mcp
-[agente] 2026-11-15T14:06:56.316 task=7c3407f1-c1fc-4a13-87e4-28d624f230ca SUBMITTED trace=089a80869a9926ff372139672c72c1d5
-[agente] 2026-11-15T14:06:56.372 task=7c3407f1-c1fc-4a13-87e4-28d624f230ca tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:06:56.483 task=7c3407f1-c1fc-4a13-87e4-28d624f230ca COMPLETED res-0006 em sala-porao
-[agente] 2026-11-15T14:06:56.492 task=cf313f6e-5e0f-44e2-9e89-fb4ee757aeda SUBMITTED trace=089a80869a9926ff372139672c72c1d5
-[agente] 2026-11-15T14:06:56.503 task=cf313f6e-5e0f-44e2-9e89-fb4ee757aeda tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:06:56.515 task=cf313f6e-5e0f-44e2-9e89-fb4ee757aeda INPUT_REQUIRED opcoes=['sala-fusca', 'sala-mirante'] (requestState guardado, 517 bytes)
-[agente] 2026-11-15T14:06:56.572 task=cf313f6e-5e0f-44e2-9e89-fb4ee757aeda COMPLETED res-0007 em sala-fusca
-[agente] 2026-11-15T14:06:56.580 task=b3923bdb-3461-463b-ad0d-55630f1afe73 SUBMITTED trace=e80e626d748297fdaeff9d322267b22f
-Task was destroyed but it is pending!
-task: <Task pending name='Task-77' coro=<EventQueueSource._dispatch_loop() done, defined at /home/thiagoduarte/fullcycle/mba-em-engenharia-de-software-com-ia/technical-challenges/04-a2a-com-mcp/agente/.venv/lib/python3.12/site-packages/a2a/utils/telemetry.py:225> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+[agente] 2026-11-15T14:42:51.377 A2A em http://127.0.0.1:7300/a2a, card em http://127.0.0.1:7300/.well-known/agent-card.json, MCP em http://localhost:7301/mcp
+[agente] 2026-11-15T14:42:51.737 task=e0c6a562-d660-47b6-b968-aaf3e42d4dfa SUBMITTED trace=4a529a1a13fc190a81cf7b12e55d7487
+[agente] 2026-11-15T14:42:51.789 task=e0c6a562-d660-47b6-b968-aaf3e42d4dfa tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:51.871 task=e0c6a562-d660-47b6-b968-aaf3e42d4dfa COMPLETED res-0006 em sala-porao
+[agente] 2026-11-15T14:42:51.876 task=edce3bb4-edcd-4874-99a4-69c4bf1a66c5 SUBMITTED trace=4a529a1a13fc190a81cf7b12e55d7487
+[agente] 2026-11-15T14:42:51.882 task=edce3bb4-edcd-4874-99a4-69c4bf1a66c5 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:51.888 task=edce3bb4-edcd-4874-99a4-69c4bf1a66c5 INPUT_REQUIRED opcoes=['sala-fusca', 'sala-mirante'] (requestState guardado, 517 bytes)
+[agente] 2026-11-15T14:42:51.916 task=edce3bb4-edcd-4874-99a4-69c4bf1a66c5 COMPLETED res-0007 em sala-fusca
+[agente] 2026-11-15T14:42:51.921 task=9a3274b5-70a8-4336-8cea-c2abb648cc02 SUBMITTED trace=1dac877b2bed5b4eb1a77198fa1bfe25
 Task was destroyed but it is pending!
 task: <Task pending name='Task-78' coro=<EventQueueSource._dispatch_loop() done, defined at /home/thiagoduarte/fullcycle/mba-em-engenharia-de-software-com-ia/technical-challenges/04-a2a-com-mcp/agente/.venv/lib/python3.12/site-packages/a2a/utils/telemetry.py:225> wait_for=<Future pending cb=[Task.task_wakeup()]>>
-[agente] 2026-11-15T14:06:56.591 task=b3923bdb-3461-463b-ad0d-55630f1afe73 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:06:56.602 task=b3923bdb-3461-463b-ad0d-55630f1afe73 INPUT_REQUIRED opcoes=['sala-mirante'] (requestState guardado, 495 bytes)
-[agente] 2026-11-15T14:06:56.638 task=b3923bdb-3461-463b-ad0d-55630f1afe73 CANCELED motivo=recusado
-[agente] 2026-11-15T14:06:56.643 task=88486d13-46f3-45f2-93e1-792316ce5dad SUBMITTED trace=608756ca58c9c83191b9e1175578de10
-[agente] 2026-11-15T14:06:56.655 task=88486d13-46f3-45f2-93e1-792316ce5dad tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:06:56.667 task=88486d13-46f3-45f2-93e1-792316ce5dad INPUT_REQUIRED opcoes=['sala-mirante'] (requestState guardado, 498 bytes)
-[agente] 2026-11-15T14:06:56.672 task=4226aea9-f57d-465b-9a76-87143494ae19 SUBMITTED trace=38a1793b931b8b287040a3e75abd8cf1
-[agente] 2026-11-15T14:06:56.682 task=4226aea9-f57d-465b-9a76-87143494ae19 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:06:56.693 task=4226aea9-f57d-465b-9a76-87143494ae19 INPUT_REQUIRED opcoes=['sala-mirante'] (requestState guardado, 498 bytes)
-[agente] 2026-11-15T14:06:56.725 task=88486d13-46f3-45f2-93e1-792316ce5dad COMPLETED res-0008 em sala-mirante
-[agente] 2026-11-15T14:06:56.759 task=4226aea9-f57d-465b-9a76-87143494ae19 COMPLETED res-0009 em sala-mirante
-[agente] 2026-11-15T14:06:56.765 task=7fb5458a-6368-4562-b4c5-134e98a8b20c SUBMITTED trace=aee3dedd5771ad5660840b9435b19dbd
-[agente] 2026-11-15T14:06:56.775 task=7fb5458a-6368-4562-b4c5-134e98a8b20c tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:06:56.786 task=7fb5458a-6368-4562-b4c5-134e98a8b20c FAILED Error executing tool reservar_sala: Sala inexistente: sala-delorean
-[agente] 2026-11-15T14:06:56.791 task=c6a72fe1-1308-4f59-a37a-b91bbc1472ee SUBMITTED trace=77b6c636fdd3d11d4fe4cf818988d98a
-[agente] 2026-11-15T14:06:56.803 task=c6a72fe1-1308-4f59-a37a-b91bbc1472ee tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:06:56.813 task=c6a72fe1-1308-4f59-a37a-b91bbc1472ee INPUT_REQUIRED opcoes=['sala-fusca', 'sala-mirante'] (requestState guardado, 511 bytes)
-[agente] 2026-11-15T14:06:56.818 task=fa73ec29-a54c-4a45-b11b-82ddf4c9e8a7 SUBMITTED trace=4d8eaabb16523787a05ef1ce1073a9bd
-[agente] 2026-11-15T14:06:56.878 task=fa73ec29-a54c-4a45-b11b-82ddf4c9e8a7 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
-[agente] 2026-11-15T14:06:56.889 task=fa73ec29-a54c-4a45-b11b-82ddf4c9e8a7 INPUT_REQUIRED opcoes=['sala-fusca', 'sala-mirante'] (requestState guardado, 511 bytes)
+Task was destroyed but it is pending!
+task: <Task pending name='Task-79' coro=<EventQueueSource._dispatch_loop() done, defined at /home/thiagoduarte/fullcycle/mba-em-engenharia-de-software-com-ia/technical-challenges/04-a2a-com-mcp/agente/.venv/lib/python3.12/site-packages/a2a/utils/telemetry.py:225> wait_for=<Future pending cb=[Task.task_wakeup()]>>
+[agente] 2026-11-15T14:42:51.927 task=9a3274b5-70a8-4336-8cea-c2abb648cc02 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:51.933 task=9a3274b5-70a8-4336-8cea-c2abb648cc02 INPUT_REQUIRED opcoes=['sala-mirante'] (requestState guardado, 495 bytes)
+[agente] 2026-11-15T14:42:51.955 task=9a3274b5-70a8-4336-8cea-c2abb648cc02 CANCELED motivo=recusado
+[agente] 2026-11-15T14:42:51.959 task=096c0d2b-dcaa-4be2-8b14-92ef19246616 SUBMITTED trace=7bedc5bdbdea1d5e74ac48b9dafc5944
+[agente] 2026-11-15T14:42:51.967 task=096c0d2b-dcaa-4be2-8b14-92ef19246616 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:51.974 task=096c0d2b-dcaa-4be2-8b14-92ef19246616 INPUT_REQUIRED opcoes=['sala-mirante'] (requestState guardado, 498 bytes)
+[agente] 2026-11-15T14:42:51.977 task=01b2f50d-2762-43cc-b28d-a72c430b7009 SUBMITTED trace=7228a102a282abed5db0b0eb93f3747e
+[agente] 2026-11-15T14:42:51.985 task=01b2f50d-2762-43cc-b28d-a72c430b7009 tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:51.993 task=01b2f50d-2762-43cc-b28d-a72c430b7009 INPUT_REQUIRED opcoes=['sala-mirante'] (requestState guardado, 498 bytes)
+[agente] 2026-11-15T14:42:52.016 task=096c0d2b-dcaa-4be2-8b14-92ef19246616 COMPLETED res-0008 em sala-mirante
+[agente] 2026-11-15T14:42:52.038 task=01b2f50d-2762-43cc-b28d-a72c430b7009 COMPLETED res-0009 em sala-mirante
+[agente] 2026-11-15T14:42:52.041 task=4b55738c-9ec8-47f0-a21b-0390f164039a SUBMITTED trace=c4b1f11610cbbb45211189aebfdb288d
+[agente] 2026-11-15T14:42:52.047 task=4b55738c-9ec8-47f0-a21b-0390f164039a tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:52.053 task=4b55738c-9ec8-47f0-a21b-0390f164039a FAILED Error executing tool reservar_sala: Sala inexistente: sala-delorean
+[agente] 2026-11-15T14:42:52.056 task=e7750d0f-c5d2-4142-90e4-d35c5b7223bb SUBMITTED trace=166f2d8660d9dad2d0d6dbf2fc6d5806
+[agente] 2026-11-15T14:42:52.064 task=e7750d0f-c5d2-4142-90e4-d35c5b7223bb tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:52.070 task=e7750d0f-c5d2-4142-90e4-d35c5b7223bb INPUT_REQUIRED opcoes=['sala-fusca', 'sala-mirante'] (requestState guardado, 509 bytes)
+[agente] 2026-11-15T14:42:52.073 task=bdf15536-98f2-4864-90dd-be7227e95b6a SUBMITTED trace=50b9e6c2338226cef1cd2d4fdc3de749
+[agente] 2026-11-15T14:42:52.134 task=bdf15536-98f2-4864-90dd-be7227e95b6a tools/list -> ['consultar_disponibilidade', 'listar_salas', 'reservar_sala']
+[agente] 2026-11-15T14:42:52.142 task=bdf15536-98f2-4864-90dd-be7227e95b6a INPUT_REQUIRED opcoes=['sala-fusca', 'sala-mirante'] (requestState guardado, 511 bytes)

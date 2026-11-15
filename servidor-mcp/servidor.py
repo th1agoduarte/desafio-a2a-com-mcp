@@ -312,10 +312,12 @@ def com_log(app: Any) -> Any:
             f" h.mcp-protocol-version={cab.get('mcp-protocol-version', '-')}"
             f" caps={json.dumps(caps, separators=(',', ':')) if caps is not None else '-'}"
         )
-        log(
+        linha = (
             f"[mcp] {datetime.now().isoformat(timespec='milliseconds')} method={req.get('method') if isinstance(req, dict) else None}"
             f" id={req.get('id') if isinstance(req, dict) else None}{extra} traceparent={meta.get('traceparent', '-')}"
         )
+        # Valores vêm do cliente: escapa quebras de linha para ninguém forjar uma linha de log.
+        log(linha.replace("\\", "\\\\").replace("\r", "\\r").replace("\n", "\\n"))
         fila = iter(mensagens)
 
         async def replay() -> dict:

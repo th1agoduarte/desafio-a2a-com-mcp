@@ -1,10 +1,10 @@
 PASS 33 requests do agente (clientInfo agente-central-de-salas) no stderr
 PASS todas as 55 linhas do stderr têm method, id e traceparent
 PASS tools/list do agente (id=1) antes do primeiro tools/call (id=3)
-PASS 9 requests do agente levam o trace-id 089a80869a9926ff372139672c72c1d5 do validador no traceparent
+PASS 9 requests do agente levam o trace-id 4a529a1a13fc190a81cf7b12e55d7487 do validador no traceparent
 PASS cada request MCP do agente tem span-id próprio, com o mesmo trace-id
 PASS todo request MCP do agente leva traceparent
 PASS todo request MCP do agente declara clientCapabilities = {"elicitation":{"form":{}}}
 PASS todo request MCP do agente leva MCP-Protocol-Version, Mcp-Method e (tools/call, resources/read) Mcp-Name iguais ao corpo
-PASS retries com id diferente do request inicial (inicial->retry): [('3', '2'), ('3', '2'), ('3', '2'), ('3', '2')]
+PASS retries com id diferente do request inicial (inicial->retry): [('6', '9'), ('12', '14'), ('17', '22'), ('20', '24')]
 resumo: 0 falha(s)

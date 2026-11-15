@@ -17,6 +17,7 @@ A ponte (onde o MRTR do MCP encontra a Task do A2A):
 from __future__ import annotations
 
 import asyncio
+import itertools
 import json
 import os
 import re
@@ -86,7 +87,13 @@ class ClienteMCP(Client):
     async def _build_session(self, exit_stack: AsyncExitStack) -> Any:
         sessao = await super()._build_session(exit_stack)
         sessao._build_capabilities = lambda _versao: CAPABILITIES  # type: ignore[method-assign]
+        # Cada execução cria um cliente novo, e o contador de ids do SDK recomeçaria em 1.
+        # Um contador único no processo garante que o retry nunca repete o id do pedido inicial.
+        sessao._dispatcher._allocate_id = lambda: next(IDS_JSONRPC)  # type: ignore[attr-defined]
         return sessao
+
+
+IDS_JSONRPC = itertools.count(1)  # ids JSON-RPC únicos no processo do agente
 
 
 @dataclass

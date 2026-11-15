@@ -1,4 +1,4 @@
-trace-id desta execucao: 089a80869a9926ff372139672c72c1d5
+trace-id desta execucao: 4a529a1a13fc190a81cf7b12e55d7487
 procure esse valor no stderr do servidor MCP para conferir a propagacao do traceparent.
 
 PASS 01 tools/list traz as tres tools

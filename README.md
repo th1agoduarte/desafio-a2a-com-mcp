@@ -74,18 +74,18 @@ Variáveis opcionais, todas com os padrões que o validador exige (detalhes em [
 
 Tudo em [`agente/agente.py`](agente/agente.py), nos dois pontos marcados `# ---- PONTE`.
 
-**Ida.** Em `AgenteSalas._tratar_resultado` ([agente/agente.py:261](agente/agente.py#L261)):
-- O agente chama a tool por `session.call_tool(..., allow_input_required=True)` (linha 140). Assim o cliente do SDK devolve o `InputRequiredResult` cru e não tenta responder a elicitation sozinho; o agente nem registra callback de elicitation.
+**Ida.** Em `AgenteSalas._tratar_resultado` ([agente/agente.py:268](agente/agente.py#L268)):
+- O agente chama a tool por `session.call_tool(..., allow_input_required=True)` (linha 147). Assim o cliente do SDK devolve o `InputRequiredResult` cru e não tenta responder a elicitation sozinho; o agente nem registra callback de elicitation.
 - Quando o resultado é `input_required`, o agente lê do `requestedSchema` a propriedade e o seu `enum` (ou `const`).
-- Guarda `Pausa(tool, argumentos, chave, opcoes, request_state, politica)` em `PAUSAS[task_id]` (linha 273).
-- Põe a Task em `TASK_STATE_INPUT_REQUIRED` com a mensagem exata `alternativas: <ids>` (linha 275).
+- Guarda `Pausa(tool, argumentos, chave, opcoes, request_state, politica)` em `PAUSAS[task_id]` (linha 280).
+- Põe a Task em `TASK_STATE_INPUT_REQUIRED` com a mensagem exata `alternativas: <ids>` (linha 282).
 
-**Volta.** Em `AgenteSalas._retomar` ([agente/agente.py:295](agente/agente.py#L295)):
+**Volta.** Em `AgenteSalas._retomar` ([agente/agente.py:302](agente/agente.py#L302)):
 - O `SendMessage` de continuação traz `taskId` e `escolha=<valor>`.
 - `escolha=recusar` vira `{"action": "decline"}`. Um id que está no enum vira `{"action": "accept", "content": {<propriedade do schema>: id}}`.
 - Qualquer outro valor mantém a Task pausada e repete a lista.
-- Para aceite ou recusa, o agente repete o mesmo `tools/call` com `inputResponses` na mesma chave e o `requestState` de `PAUSAS[task_id]` ecoado sem modificação (linha 319). O SDK emite cada request com um id JSON-RPC novo.
-- No log do servidor MCP aparecem pares como `id=5` (inicial) e `id=6 ... retry=sim` (retry).
+- Para aceite ou recusa, o agente repete o mesmo `tools/call` com `inputResponses` na mesma chave e o `requestState` de `PAUSAS[task_id]` ecoado sem modificação (linha 326). O SDK emite cada request com um id JSON-RPC novo.
+- No log do servidor MCP aparecem pares como `id=6` (inicial) e `id=9 ... retry=sim` (retry). Os ids vêm de um contador único no processo do agente (`IDS_JSONRPC`), então o retry nunca repete o id do pedido inicial, mesmo com um cliente MCP novo por execução.
 - A resposta fecha a Task:
   - `complete` → `COMPLETED`, com o artifact `reserva`;
   - `reservado: false` → `CANCELED`;
@@ -122,19 +122,19 @@ O envelope é cifrado e autenticado com **AES-256-GCM**, numa chave derivada por
 
 **Host MCP.**
 - Um cliente MCP por execução do agente, aberto e fechado na mesma task assíncrona. O protocolo não tem sessão, então isso não custa estado, e uma falha de transporte fica restrita àquela execução.
-- Erro de protocolo do MCP (por exemplo `requestState` expirado depois de 10 minutos) ou servidor fora do ar termina a Task em `FAILED` com a causa ([agente/agente.py:230](agente/agente.py#L230)). A Task nunca fica presa em `WORKING`, e o agente volta a atender assim que o servidor MCP volta; os passos `extra-1` e `extra-2` de `make fluxo` comprovam.
+- Erro de protocolo do MCP (por exemplo `requestState` expirado depois de 10 minutos) ou servidor fora do ar termina a Task em `FAILED` com a causa ([agente/agente.py:237](agente/agente.py#L237)). A Task nunca fica presa em `WORKING`, e o agente volta a atender assim que o servidor MCP volta; os passos `extra-1` e `extra-2` de `make fluxo` comprovam.
 - O agente usa o `Client` do SDK no modo `2026-07-28`, sem handshake: cada request carrega `protocolVersion`, `clientInfo` e `clientCapabilities` no `_meta`, e o SDK espelha `MCP-Protocol-Version`, `Mcp-Method` e `Mcp-Name` nos headers.
 - O SDK só declara elicitation quando há callback, e aí declara `form` + `url`. A subclasse `ClienteMCP` fixa exatamente `{"elicitation": {"form": {}}}`, que é o que o agente atende.
 - As ferramentas vêm de `tools/list`, feito no início de cada execução, antes de qualquer `tools/call`. As chaves do pedido são filtradas pelo `inputSchema` descoberto. Esse `tools/list` leva o `traceparent` da Task e alimenta o cache de schemas do SDK; sem ele, o SDK faria um `tools/list` próprio, sem o nosso `_meta`.
 - A versão da política sai da primeira linha do resource `politica://uso`, lido a cada pedido, e vai no campo `politica` do artifact.
 
-**Reenvio do mesmo `requestState`.** Dentro da validade, o servidor aceita o mesmo token mais de uma vez: não há marcação de "usado". É uma escolha consciente, porque marcar exigiria memória no servidor entre o `input_required` e o retry, que o enunciado proíbe, e o próprio passo 12 do avaliador reusa o token depois de um restart. Do lado do agente, a pausa é consumida no primeiro retry, e uma trava por Task serializa continuações simultâneas.
+**Reenvio do mesmo `requestState`.** Dentro da validade, o servidor aceita o mesmo token mais de uma vez: não há marcação de "usado". É uma escolha consciente, porque marcar exigiria memória no servidor entre o `input_required` e o retry, que o enunciado proíbe, e o próprio passo 12 do avaliador reusa o token depois de um restart. Do lado do agente, a pausa é consumida no primeiro retry, e uma trava por Task serializa continuações simultâneas. Consequência aceita: um cliente MCP que fale direto com o servidor e reenvie o mesmo token com `accept` dentro da validade cria uma reserva a cada envio (cada uma em sala livre, sem conflito). Pelo agente isso não acontece. Valores vindos do cliente são escapados no log do servidor (quebras de linha viram `\n`), para que um `params.name` com `\n` não forje uma linha.
 
 **Sem regra de negócio no agente.** Conflito, janela, duração e alternativas são decididos só pelo servidor MCP. O agente interpreta dois formatos fixos (`reservar ...` e `escolha=...`) por regex e valida a escolha contra o enum que o próprio servidor mandou. Mesmo pedido, mesmo resultado.
 
 **Divergências de SDK, documentadas em vez de contornadas no protocolo.**
-1. **`A2A-Version`.** O `a2a-sdk` interpreta a ausência do header `A2A-Version` como v0.3 e recusa `SendMessage`. O validador e os exemplos de wire mandam métodos da v1.0 sem o header. O `ContextoV1` ([agente/agente.py:376](agente/agente.py#L376)) assume `1.0` quando o header falta; um header explícito continua valendo.
-2. **`history`.** O `a2a-sdk` só move `status.message` para o `history` na atualização seguinte, então a mensagem de um estado terminal (o erro exato da tool em `FAILED`) nunca apareceria no histórico. O `TaskStoreComHistorico` (linha 328) inclui cada mensagem de status no `history` assim que ela é emitida, deduplicada por `messageId`, no mesmo formato de `exemplos/wire/08` e `10`.
+1. **`A2A-Version`.** O `a2a-sdk` interpreta a ausência do header `A2A-Version` como v0.3 e recusa `SendMessage`. O validador e os exemplos de wire mandam métodos da v1.0 sem o header. O `ContextoV1` ([agente/agente.py:383](agente/agente.py#L383)) assume `1.0` quando o header falta; um header explícito continua valendo.
+2. **`history`.** O `a2a-sdk` só move `status.message` para o `history` na atualização seguinte, então a mensagem de um estado terminal (o erro exato da tool em `FAILED`) nunca apareceria no histórico. O `TaskStoreComHistorico` (linha 335) inclui cada mensagem de status no `history` assim que ela é emitida, deduplicada por `messageId`, no mesmo formato de `exemplos/wire/08` e `10`.
 3. **Prefixo do erro.** O SDK do MCP prefixa erros de execução com `Error executing tool reservar_sala: `. O enunciado aceita.
 
 **Log no stderr do servidor MCP.** Um middleware ASGI registra todo POST, inclusive os que o SDK rejeita antes da tool, com:
@@ -142,14 +142,14 @@ O envelope é cifrado e autenticado com **AES-256-GCM**, numa chave derivada por
 - os headers `Mcp-Method`, `Mcp-Name` e `MCP-Protocol-Version`;
 - `clientInfo`, `clientCapabilities` e `traceparent`.
 
-Exemplo: `[mcp] ... method=tools/call id=6 name=reservar_sala retry=sim h.mcp-method=tools/call h.mcp-name=reservar_sala ... client=agente-central-de-salas caps={"elicitation":{"form":{}}} traceparent=00-<trace-id>-<span>-01`.
+Exemplo: `[mcp] ... method=tools/call id=9 name=reservar_sala retry=sim h.mcp-method=tools/call h.mcp-name=reservar_sala ... client=agente-central-de-salas caps={"elicitation":{"form":{}}} traceparent=00-<trace-id>-<span>-01`.
 
 ## Saída do validador
 
 Última execução (`make validar`), com os dois processos recém-iniciados. A mesma saída está em [docs/evidencias/validador.txt](docs/evidencias/validador.txt). O stderr correspondente do servidor MCP está em [servidor-mcp.stderr.txt](docs/evidencias/servidor-mcp.stderr.txt), onde o trace-id da primeira linha aparece no `traceparent` dos requests do agente. A conferência automática desse stderr está em [conferencia-logs.txt](docs/evidencias/conferencia-logs.txt).
 
 ```text
-trace-id desta execucao: 089a80869a9926ff372139672c72c1d5
+trace-id desta execucao: 4a529a1a13fc190a81cf7b12e55d7487
 procure esse valor no stderr do servidor MCP para conferir a propagacao do traceparent.
 
 PASS 01 tools/list traz as tres tools
