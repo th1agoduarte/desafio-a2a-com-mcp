@@ -1,0 +1,7 @@
+PASS 1 sem REQUEST_STATE_SECRET o servidor não sobe (exit=1)
+PASS 2 com 16 bytes o servidor não sobe (exit=1)
+PASS 3 nenhum segredo hex de 32+ bytes no código; a chave só vem de os.getenv("REQUEST_STATE_SECRET")
+PASS 4 Mcp-Method divergente do corpo -> {"jsonrpc":"2.0","id":1,"error":{"code":-32020,"message":"mcp-method header does not match the request body's method"}} http=400
+PASS 5 nenhum SDK de LLM nos pyproject.toml nem nos uv.lock
+PASS 6 dados/, validador/ e exemplos/ idênticos a upstream/main
+resumo: 0 falha(s)

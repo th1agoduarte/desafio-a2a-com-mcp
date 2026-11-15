@@ -1,0 +1,9 @@
+PASS passo 3: supportedInterfaces=[{"url": "http://127.0.0.1:7300/a2a", "protocolBinding": "JSONRPC", "protocolVersion": "1.0"}] skills=['reservar-sala']
+PASS passo 7: estado=TASK_STATE_INPUT_REQUIRED mensagem='alternativas: sala-fusca, sala-mirante'
+PASS passo 8: estado=TASK_STATE_COMPLETED artifact={"reserva": "res-0003", "sala": "sala-mirante", "inicio": "2026-11-03T14:00:00-03:00", "fim": "2026-11-03T15:00:00-03:00", "responsavel": "Marty", "politica": "2026-11-01"}
+PASS passo 9: pausa='alternativas: sala-fusca' estado final=TASK_STATE_CANCELED
+PASS passo 10: estado=TASK_STATE_FAILED mensagem='Error executing tool reservar_sala: Sala inexistente: sala-inexistente'
+PASS passo 11: alternativas=['sala-fusca'] http=400 error={"code": -32602, "message": "Invalid or expired requestState", "data": {"reason": "invalid_request_state"}}
+PASS passo 12: http=200 structuredContent={"reserva": "res-0003", "reservado": true, "sala": "sala-fusca", "inicio": "2026-11-03T14:00:00-03:00", "fim": "2026-11-03T15:00:00-03:00", "responsavel": "Marty", "politica": "2026-11-01", "motivo": null}
+PASS passo 13: http=400 error={"code": -32021, "message": "Client did not declare the form elicitation capability required by reservar_sala", "data": {"requiredCapabilities": {"elicitation": {"form": {}}}}}
+resumo: 0 falha(s)
