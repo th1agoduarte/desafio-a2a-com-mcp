@@ -8,7 +8,7 @@ SHELL := /bin/bash
 export
 EVID := docs/evidencias
 
-.PHONY: help setup env mcp agente validar fluxo extras test evidencias parar clean
+.PHONY: upstream help setup env mcp agente validar fluxo extras test evidencias parar clean
 
 help: ## Lista os alvos
 	@grep -hE '^[a-zA-Z_-]+:.*?## ' $(MAKEFILE_LIST) | awk 'BEGIN{FS=":.*?## "}{printf "  \033[36m%-11s\033[0m %s\n", $$1, $$2}'
@@ -33,7 +33,7 @@ validar: ## Sobe os dois do zero, roda validador/validar.py e confere o stderr d
 fluxo: ## Passos manuais do Fluxo do avaliador (3, 7-13), com restart do MCP -> docs/evidencias/fluxo-avaliador.txt
 	@python3 scripts/fluxo_avaliador.py | tee $(EVID)/fluxo-avaliador.txt
 
-extras: ## Segredo obrigatório, sem segredo no código, -32020, sem SDK de LLM, pastas protegidas
+extras: upstream ## Segredo obrigatório, sem segredo no código, -32020, sem SDK de LLM, pastas protegidas
 	@scripts/verificacoes_extras.sh | tee $(EVID)/verificacoes-extras.txt
 
 test: validar fluxo extras ## Tudo: validador (36) + conferência de logs + fluxo do avaliador + extras
@@ -45,3 +45,7 @@ parar: ## Derruba o que estiver nas portas 7300 e 7301
 
 clean: parar ## Remove caches e venvs
 	rm -rf servidor-mcp/.venv agente/.venv servidor-mcp/__pycache__ agente/__pycache__
+
+upstream: ## Garante o remote upstream (repositório base) usado nas comparações; cria no clone limpo
+	@git remote get-url upstream >/dev/null 2>&1 || git remote add upstream https://github.com/devfullcycle/desafio-a2a-com-mcp.git
+	@git fetch -q upstream
