@@ -4,6 +4,8 @@ PASS passo 8: estado=TASK_STATE_COMPLETED artifact={"reserva": "res-0003", "sala
 PASS passo 9: pausa='alternativas: sala-fusca' estado final=TASK_STATE_CANCELED
 PASS passo 10: estado=TASK_STATE_FAILED mensagem='Error executing tool reservar_sala: Sala inexistente: sala-inexistente'
 PASS passo 11: alternativas=['sala-fusca'] http=400 error={"code": -32602, "message": "Invalid or expired requestState", "data": {"reason": "invalid_request_state"}}
-PASS passo 12: http=200 structuredContent={"reserva": "res-0003", "reservado": true, "sala": "sala-fusca", "inicio": "2026-11-03T14:00:00-03:00", "fim": "2026-11-03T15:00:00-03:00", "responsavel": "Marty", "politica": "2026-11-01", "motivo": null}
+PASS passo 12: processo novo=True http=200 structuredContent={"reserva": "res-0003", "reservado": true, "sala": "sala-fusca", "inicio": "2026-11-03T14:00:00-03:00", "fim": "2026-11-03T15:00:00-03:00", "responsavel": "Marty", "politica": "2026-11-01", "motivo": null}
 PASS passo 13: http=400 error={"code": -32021, "message": "Client did not declare the form elicitation capability required by reservar_sala", "data": {"requiredCapabilities": {"elicitation": {"form": {}}}}}
+PASS passo extra-1: pausa='alternativas: sala-garagem, sala-mirante' -> com MCP fora do ar: TASK_STATE_FAILED 'Falha ao falar com o servidor MCP: All connection attempts failed'
+PASS passo extra-2: depois de o MCP voltar: TASK_STATE_COMPLETED 'Reserva res-0003 confirmada na sala-aquario.'
 resumo: 0 falha(s)

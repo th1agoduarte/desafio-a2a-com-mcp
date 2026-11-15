@@ -44,6 +44,9 @@ There are two processes, and the agent talks to the MCP server only over HTTP. N
   - The Task then goes to `TASK_STATE_INPUT_REQUIRED` with the exact text `alternativas: a, b`.
 - **Bridge, return:** `_retomar`.
   - `escolha=<id|recusar>` repeats `session.call_tool(..., allow_input_required=True, input_responses=..., request_state=...)`. The SDK gives it a new JSON-RPC id.
+- One MCP client **per execution** (`novo_cliente_mcp()`), entered and exited in the same asyncio task. A shared client died for good after one transport error; this was found in code review.
+  - Any exception (an MCP JSON-RPC error such as an expired requestState, or the server being down) sends the Task to FAILED, so it never stays WORKING. Per-task `TRAVAS` serialize continuations.
+  - `tools/list` runs at the start of every execution with the Task's traceparent. It also fills the SDK schema cache; otherwise the SDK sends its own `tools/list` without our `_meta`.
 - MCP client:
   - `ClienteMCP` subclasses `mcp.client.Client` with `mode="2026-07-28"` and no elicitation callback, so the raw `input_required` reaches the agent.
   - It forces the capabilities to exactly `{"elicitation":{"form":{}}}`. The SDK would otherwise declare form plus url, and only when a callback exists.

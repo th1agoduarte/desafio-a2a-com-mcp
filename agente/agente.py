@@ -16,6 +16,7 @@ A ponte (onde o MRTR do MCP encontra a Task do A2A):
 
 from __future__ import annotations
 
+import asyncio
 import json
 import os
 import re
@@ -95,14 +96,15 @@ class Pausa:
     tool: str
     argumentos: dict[str, str]
     chave: str
+    campo: str  # nome da propriedade do requestedSchema (o servidor decide; o agente não fixa)
     opcoes: list[str]
     request_state: str
     politica: str
 
 
 PAUSAS: dict[str, Pausa] = {}  # task_id -> pausa; nunca serializado para o cliente A2A
-TRACES: dict[str, str] = {}  # task_id -> trace-id W3C, para todos os requests MCP da Task
-FERRAMENTAS: dict[str, mcp_types.Tool] = {}  # preenchido por tools/list antes da primeira chamada
+TRACES: dict[str, str] = {}  # task_id -> trace-id W3C, para todos os requests MCP da Task (só enquanto viva)
+TRAVAS: dict[str, asyncio.Lock] = {}  # uma continuação por vez em cada Task
 
 
 def traceparent(trace_id: str) -> str:
@@ -116,12 +118,15 @@ class Host:
     def meta(self, trace_id: str) -> dict[str, Any]:
         return {"traceparent": traceparent(trace_id)}
 
-    async def descobrir(self, trace_id: str) -> None:
-        if FERRAMENTAS:
-            return
+    async def descobrir(self, trace_id: str) -> dict[str, mcp_types.Tool]:
+        """tools/list no início de cada execução, com o traceparent da Task.
+
+        Além de descobrir a tool em runtime, alimenta o cache de schemas do cliente do SDK;
+        sem isso, o SDK faria um tools/list próprio (sem o nosso _meta) para validar o
+        structuredContent do tools/call.
+        """
         resultado = await self.cliente.list_tools(meta=self.meta(trace_id))
-        FERRAMENTAS.update({t.name: t for t in resultado.tools})
-        log(f"tools/list -> {sorted(FERRAMENTAS)}")
+        return {t.name: t for t in resultado.tools}
 
     async def versao_politica(self, trace_id: str) -> str:
         resultado = await self.cliente.read_resource(RESOURCE_POLITICA, meta=self.meta(trace_id))
@@ -163,23 +168,35 @@ def texto_do_resultado(resultado: mcp_types.CallToolResult) -> str:
     return " ".join(c.text for c in resultado.content if isinstance(c, mcp_types.TextContent)).strip()
 
 
-def opcoes_da_elicitation(pedido: mcp_types.InputRequest) -> list[str]:
-    """As alternativas são o enum (ou const, com uma só) da propriedade do requestedSchema."""
+def opcoes_da_elicitation(pedido: mcp_types.InputRequest) -> tuple[str, list[str]]:
+    """(propriedade, alternativas): o enum (ou const, com uma só) da propriedade do requestedSchema."""
     params = pedido.params
     schema = getattr(params, "requested_schema", None) or {}
     if not isinstance(schema, dict):
         schema = schema.model_dump(by_alias=True, exclude_none=True)
-    for prop in (schema.get("properties") or {}).values():
+    for nome, prop in (schema.get("properties") or {}).items():
         if "enum" in prop:
-            return [str(v) for v in prop["enum"]]
+            return nome, [str(v) for v in prop["enum"]]
         if "const" in prop:
-            return [str(prop["const"])]
-    return []
+            return nome, [str(prop["const"])]
+    return "", []
+
+
+def novo_cliente_mcp() -> ClienteMCP:
+    return ClienteMCP(
+        MCP_URL,
+        mode=PROTOCOLO_MCP,  # sem handshake: cada request leva versão e capabilities no _meta
+        client_info=mcp_types.Implementation(name="agente-central-de-salas", version="1.0.0"),
+        cache=None,
+    )
 
 
 class AgenteSalas(AgentExecutor):
-    def __init__(self, host: Host) -> None:
-        self.host = host
+    """Um cliente MCP por execução (aberto e fechado na mesma task assíncrona).
+
+    O protocolo não tem sessão, então isso não custa nada de estado; e uma falha de transporte
+    (servidor MCP fora do ar) fica restrita àquela execução, sem inutilizar o agente.
+    """
 
     async def execute(self, context: RequestContext, event_queue: EventQueue) -> None:
         atual = context.current_task  # na continuação, ids vêm da Task guardada, não da mensagem
@@ -195,19 +212,39 @@ class AgenteSalas(AgentExecutor):
         def msg(texto: str) -> Any:
             return updater.new_agent_message([new_text_part(texto)])
 
-        if context.current_task is None:
-            await event_queue.enqueue_event(
-                new_task(task_id, context_id, TaskState.TASK_STATE_SUBMITTED, history=[context.message])
-            )
-            log(f"task={task_id} SUBMITTED trace={trace_id}")
-            await updater.start_work()
-            await self._novo_pedido(task_id, texto_de(context), trace_id, updater, msg)
-        else:
-            await self._retomar(task_id, texto_de(context), trace_id, updater, msg)
+        async with TRAVAS.setdefault(task_id, asyncio.Lock()):
+            try:
+                novo = context.current_task is None
+                if novo:
+                    await event_queue.enqueue_event(
+                        new_task(task_id, context_id, TaskState.TASK_STATE_SUBMITTED, history=[context.message])
+                    )
+                    log(f"task={task_id} SUBMITTED trace={trace_id}")
+                    await updater.start_work()
+                async with novo_cliente_mcp() as cliente:
+                    host = Host(cliente)
+                    if novo:
+                        await self._novo_pedido(host, task_id, texto_de(context), trace_id, updater, msg)
+                    else:
+                        await self._retomar(host, task_id, texto_de(context), trace_id, updater, msg)
+            except Exception as exc:  # erro JSON-RPC do MCP (ex.: requestState expirado) ou servidor fora do ar
+                while getattr(exc, "exceptions", None):  # ExceptionGroup do anyio: mostra a causa real
+                    exc = exc.exceptions[0]
+                PAUSAS.pop(task_id, None)
+                log(f"task={task_id} FAILED erro de protocolo/transporte MCP: {exc!r}")
+                try:
+                    await updater.failed(msg(f"Falha ao falar com o servidor MCP: {exc}"))
+                except RuntimeError:  # a Task já tinha chegado a estado terminal
+                    pass
+            finally:
+                if task_id not in PAUSAS:  # terminal: nada mais a propagar nesta Task
+                    TRACES.pop(task_id, None)
+                    TRAVAS.pop(task_id, None)
 
-    async def _novo_pedido(self, task_id: str, texto: str, trace_id: str, updater: TaskUpdater, msg: Any) -> None:
-        await self.host.descobrir(trace_id)
-        tool = FERRAMENTAS.get(TOOL_RESERVA)
+    async def _novo_pedido(self, host: Host, task_id: str, texto: str, trace_id: str, updater: TaskUpdater, msg: Any) -> None:
+        ferramentas = await host.descobrir(trace_id)
+        log(f"task={task_id} tools/list -> {sorted(ferramentas)}")
+        tool = ferramentas.get(TOOL_RESERVA)
         if tool is None:
             await updater.failed(msg(f"O servidor MCP nao anuncia a tool {TOOL_RESERVA}"))
             return
@@ -217,8 +254,8 @@ class AgenteSalas(AgentExecutor):
                 msg("Pedido invalido: use reservar sala=<id> inicio=<iso8601> fim=<iso8601> responsavel=<nome>")
             )
             return
-        politica = await self.host.versao_politica(trace_id)
-        resultado = await self.host.chamar(trace_id, tool.name, argumentos)
+        politica = await host.versao_politica(trace_id)
+        resultado = await host.chamar(trace_id, tool.name, argumentos)
         await self._tratar_resultado(task_id, tool.name, argumentos, politica, resultado, updater, msg)
 
     async def _tratar_resultado(
@@ -232,8 +269,8 @@ class AgenteSalas(AgentExecutor):
                 await updater.failed(msg("Resposta input_required inesperada do servidor MCP"))
                 return
             chave, pedido = next(iter(pedidos.items()))
-            opcoes = opcoes_da_elicitation(pedido)
-            PAUSAS[task_id] = Pausa(tool, argumentos, chave, opcoes, resultado.request_state, politica)
+            campo, opcoes = opcoes_da_elicitation(pedido)
+            PAUSAS[task_id] = Pausa(tool, argumentos, chave, campo, opcoes, resultado.request_state, politica)
             log(f"task={task_id} INPUT_REQUIRED opcoes={opcoes} (requestState guardado, {len(resultado.request_state)} bytes)")
             await updater.requires_input(msg("alternativas: " + ", ".join(opcoes)))
             return
@@ -255,23 +292,26 @@ class AgenteSalas(AgentExecutor):
         log(f"task={task_id} COMPLETED {reserva['reserva']} em {reserva['sala']}")
         await updater.complete(msg(f"Reserva {reserva['reserva']} confirmada na {reserva['sala']}."))
 
-    async def _retomar(self, task_id: str, texto: str, trace_id: str, updater: TaskUpdater, msg: Any) -> None:
+    async def _retomar(self, host: Host, task_id: str, texto: str, trace_id: str, updater: TaskUpdater, msg: Any) -> None:
         pausa = PAUSAS.get(task_id)
         if pausa is None:
             await updater.failed(msg("Task sem pausa pendente"))
+            return
+        if pausa.tool not in await host.descobrir(trace_id):
+            await updater.failed(msg(f"O servidor MCP nao anuncia mais a tool {pausa.tool}"))
             return
         m = ESCOLHA_RE.match(texto)
         valor = m.group(1) if m else None
         if valor == "recusar":
             resposta: dict[str, Any] = {"action": "decline"}
         elif valor in pausa.opcoes:
-            resposta = {"action": "accept", "content": {"sala": valor}}
+            resposta = {"action": "accept", "content": {pausa.campo: valor}}
         else:  # fora do enum da elicitation: continua pausada, repetindo a lista
             await updater.requires_input(msg("alternativas: " + ", ".join(pausa.opcoes)))
             return
         await updater.start_work()
         # ---- PONTE, volta: o mesmo tools/call, id novo, inputResponses na mesma chave, requestState ecoado.
-        resultado = await self.host.chamar(
+        resultado = await host.chamar(
             trace_id,
             pausa.tool,
             pausa.argumentos,
@@ -350,21 +390,14 @@ class ContextoV1(DefaultServerCallContextBuilder):
 
 
 def criar_app() -> Starlette:
-    cliente = ClienteMCP(
-        MCP_URL,
-        mode=PROTOCOLO_MCP,  # sem handshake: cada request leva versão e capabilities no _meta
-        client_info=mcp_types.Implementation(name="agente-central-de-salas", version="1.0.0"),
-        cache=None,
-    )
     handler = DefaultRequestHandlerV2(
-        agent_executor=AgenteSalas(Host(cliente)), task_store=TaskStoreComHistorico(), agent_card=CARD
+        agent_executor=AgenteSalas(), task_store=TaskStoreComHistorico(), agent_card=CARD
     )
 
     @asynccontextmanager
     async def ciclo(_app: Starlette):
-        async with cliente:
-            log(f"A2A em {URL_PUBLICA}/a2a, card em {URL_PUBLICA}/.well-known/agent-card.json, MCP em {MCP_URL}")
-            yield
+        log(f"A2A em {URL_PUBLICA}/a2a, card em {URL_PUBLICA}/.well-known/agent-card.json, MCP em {MCP_URL}")
+        yield
 
     rotas = create_agent_card_routes(CARD) + create_jsonrpc_routes(handler, rpc_url="/a2a", context_builder=ContextoV1())
     return Starlette(routes=rotas, lifespan=ciclo)

@@ -303,7 +303,7 @@ def com_log(app: Any) -> Any:
         extra = f" name={params['name']}" if "name" in params else (f" uri={params['uri']}" if "uri" in params else "")
         if "requestState" in params:
             extra += " retry=sim"
-        cab = {k.decode().lower(): v.decode() for k, v in scope.get("headers", [])}
+        cab = {k.decode("latin-1").lower(): v.decode("latin-1") for k, v in scope.get("headers", [])}
         caps = meta.get("io.modelcontextprotocol/clientCapabilities")
         info = meta.get("io.modelcontextprotocol/clientInfo")
         extra += f" client={info.get('name', '-') if isinstance(info, dict) else '-'}"

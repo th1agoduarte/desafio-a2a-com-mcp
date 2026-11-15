@@ -38,7 +38,7 @@ Os passos abaixo detalham cada critério e o comando que o comprova.
 | Retry com `inputResponses` e `requestState` conclui com `complete` | validador 16 | `PASS 16` |
 | `requestState` adulterado → -32602 | validador 17; `make fluxo`, passo 11 (um caractere trocado no meio) | `PASS 17`; `http=400 error={"code": -32602, ...}` |
 | Argumentos adulterados no retry não tomam efeito | validador 18 | `PASS 18` (o boundary rejeita: digest dos argumentos não bate) |
-| Retry válido depois de reiniciar o servidor MCP | `make fluxo`, passo 12 | `PASS passo 12: http=200 structuredContent={... "reservado": true, "sala": "sala-fusca" ...}` |
+| Retry válido depois de reiniciar o servidor MCP | `make fluxo`, passo 12 | `PASS passo 12: processo novo=True http=200 structuredContent={... "reservado": true, "sala": "sala-fusca" ...}` |
 | Chave de `REQUEST_STATE_SECRET`, ≥ 32 bytes, sem segredo no código | `make extras`, itens 1 a 3 | servidor sai com erro sem a variável e com 16 bytes; nenhum hex de 32+ bytes no código |
 | `decline` conclui sem reservar e sem `isError` | validador 19 | `PASS 19` |
 | Sem alternativa → `isError` com a mensagem exata | validador 20 | `PASS 20` |
@@ -74,6 +74,7 @@ Os passos abaixo detalham cada critério e o comando que o comprova.
 | Escolha fora do enum mantém a pausa | validador 29 | `PASS 29` |
 | Duas Tasks pausadas, cada uma com a sua reserva | validador 33 | `PASS 33` |
 | `requestState` nunca em resposta A2A | validador 34 | `PASS 34` |
+| Erro do MCP não deixa a Task presa; o agente se recupera | `make fluxo`, passos `extra-1` e `extra-2` | servidor MCP fora do ar com Task pausada → `TASK_STATE_FAILED`; servidor de volta → novo pedido `TASK_STATE_COMPLETED`, sem reiniciar o agente |
 | Retry com id JSON-RPC diferente do inicial | `conferencia-logs.txt` | `PASS retries com id diferente do request inicial (inicial->retry): [('5', '6'), ...]` |
 
 ## 6. Validação e entrega

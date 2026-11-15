@@ -7,7 +7,10 @@ import re
 import sys
 
 saida, stderr = open(sys.argv[1]).read(), open(sys.argv[2]).read().splitlines()
-trace_id = re.search(r"trace-id desta execucao: ([0-9a-f]{32})", saida).group(1)
+achado = re.search(r"trace-id desta execucao: ([0-9a-f]{32})", saida)
+if not achado:
+    sys.exit("FAIL saída do validador sem a linha do trace-id")
+trace_id = achado.group(1)
 linhas = [l for l in stderr if l.startswith("[mcp] ") and " method=" in l]
 campos = [dict(re.findall(r"([\w.-]+)=(\S+)", l)) for l in linhas]
 # O agente se identifica no _meta (clientInfo); o validador não manda clientInfo.
@@ -21,7 +24,8 @@ def check(ok: bool, texto: str) -> None:
     print(("PASS " if ok else "FAIL ") + texto)
 
 
-check(all("method" in c and "id" in c and "traceparent" in c for c in campos), f"todas as {len(campos)} linhas do stderr têm method, id e traceparent")
+check(bool(do_agente), f"{len(do_agente)} requests do agente (clientInfo agente-central-de-salas) no stderr")
+check(bool(campos) and all("method" in c and "id" in c and "traceparent" in c for c in campos), f"todas as {len(campos)} linhas do stderr têm method, id e traceparent")
 primeiro_call = next((i for i, c in enumerate(do_agente) if c["method"] == "tools/call"), None)
 primeiro_list = next((i for i, c in enumerate(do_agente) if c["method"] == "tools/list"), None)
 check(primeiro_list is not None and primeiro_call is not None and primeiro_list < primeiro_call,
